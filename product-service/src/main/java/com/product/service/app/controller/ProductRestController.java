@@ -11,6 +11,8 @@ import com.product.service.app.model.Product;
 import com.product.service.app.repository.ProductRepository;
 import com.product.service.app.restclient.CouponClient;
 
+import io.github.resilience4j.retry.annotation.Retry;
+
 @RestController
 @RequestMapping("/productapi")
 public class ProductRestController {
@@ -22,10 +24,16 @@ public class ProductRestController {
 	CouponClient couponClient;
 
 	@PostMapping("/products")
+	@Retry(name="product-api", fallbackMethod = "handleError")
 	public Product create(@RequestBody Product product) {
 		Coupon coupon = couponClient.getCoupon(product.getCouponCode());
 		product.setPrice(product.getPrice().subtract(coupon.getDiscount()));
 		return productRepository.save(product);
+	}
+	
+	public Product handleError(Product product, Exception exception) {
+		System.out.println("Inside Handle Error");
+		return product;
 	}
 
 }
