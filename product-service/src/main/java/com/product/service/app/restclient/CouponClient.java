@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.product.service.app.dto.Coupon;
 
-@FeignClient("COUPON-SERVICE")
+@FeignClient("GATEWAY-SERVICE")
 public interface CouponClient {
 
 	@GetMapping("/couponapi/coupons/{code}")
