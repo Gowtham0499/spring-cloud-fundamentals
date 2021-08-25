@@ -6,20 +6,26 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.product.service.app.dto.Coupon;
 import com.product.service.app.model.Product;
 import com.product.service.app.repository.ProductRepository;
+import com.product.service.app.restclient.CouponClient;
 
 @RestController
 @RequestMapping("/productapi")
 public class ProductRestController {
-	
+
 	@Autowired
 	ProductRepository productRepository;
-	
+
+	@Autowired
+	CouponClient couponClient;
+
 	@PostMapping("/products")
 	public Product create(@RequestBody Product product) {
+		Coupon coupon = couponClient.getCoupon(product.getCouponCode());
+		product.setPrice(product.getPrice().subtract(coupon.getDiscount()));
 		return productRepository.save(product);
 	}
-	
 
 }
