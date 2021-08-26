@@ -1,6 +1,9 @@
 package com.product.service.app.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +18,7 @@ import io.github.resilience4j.retry.annotation.Retry;
 
 @RestController
 @RequestMapping("/productapi")
+@RefreshScope
 public class ProductRestController {
 
 	@Autowired
@@ -22,6 +26,9 @@ public class ProductRestController {
 
 	@Autowired
 	CouponClient couponClient;
+	
+	@Value("${custom.property}")
+	private String prop;
 
 	@PostMapping("/products")
 	@Retry(name="product-api", fallbackMethod = "handleError")
@@ -34,6 +41,11 @@ public class ProductRestController {
 	public Product handleError(Product product, Exception exception) {
 		System.out.println("Inside Handle Error");
 		return product;
+	}
+	
+	@GetMapping("/prop")
+	public String customConfigProperty() {
+		return this.prop;
 	}
 
 }
